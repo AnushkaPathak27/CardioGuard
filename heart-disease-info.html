@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Detected | CardioGuard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            opacity: 0.1;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            50% { transform: rotate(180deg) translate(50px, 50px); }
+            100% { transform: rotate(360deg) translate(0, 0); }
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        @media print {
+            .nav-bar, .floating-shapes, .print-button, .back-button {
+                display: none !important;
+            }
+            .bg-gradient-to-br {
+                background: white !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-red-50 to-gray-100 min-h-screen">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <nav class="fixed w-full bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-2xl font-semibold gradient-text">CardioGuard</a>
+                <div class="flex items-center space-x-6">
+                    <a href="{{ url_for('history') }}" class="nav-link text-gray-700 hover:text-gray-900 font-medium">View Data</a>
+                    <a href="{{ url_for('logout') }}" class="nav-link text-gray-700 hover:text-gray-900 font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-24">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white bg-opacity-95 backdrop-filter backdrop-blur-lg rounded-3xl shadow-xl p-8 lg:p-12">
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg mb-8 animate-fade-in">
+                    <p class="flex items-center text-red-700">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        Important: This is a preliminary assessment. Please consult with a healthcare professional for proper diagnosis.
+                    </p>
+                </div>
+
+                <h1 class="text-4xl font-bold mb-8 text-center gradient-text">Heart Disease Risk Detected</h1>
+
+                <div class="space-y-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:transform hover:-translate-y-1 transition-all duration-200 border border-red-100">
+                        <h2 class="text-xl font-semibold text-red-600 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Immediate Steps
+                        </h2>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Schedule an appointment with your healthcare provider within the next 24-48 hours
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Stay calm and collected - early detection significantly improves outcomes
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Document any symptoms you're experiencing and their frequency
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Make a list of all current medications and supplements you're taking
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Inform a family member or friend who can provide support
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 shadow-lg hover:transform hover:-translate-y-1 transition-all duration-200 border border-red-100">
+                        <h2 class="text-xl font-semibold text-red-600 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                            Recommended Lifestyle Changes
+                        </h2>
+                        <ul class="space-y-3 text-gray-700">
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Begin with gentle exercise like walking for 30 minutes daily
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Adopt a heart-healthy Mediterranean diet
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Practice stress reduction techniques
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Monitor blood pressure readings twice daily
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="w-5 h-5 text-red-500 mr-2 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                Ensure 7-8 hours of quality sleep each night
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-red-50 rounded-2xl p-6 border-2 border-red-200">
+                        <h2 class="text-xl font-semibold text-red-600 mb-4 flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            Emergency Contacts
+                        </h2>
+                        <p class="text-red-700 mb-4">If you experience chest pain, shortness of breath, or severe discomfort:</p>
+                        <div class="space-y-2 text-red-700">
+                            <p class="flex items-center">
+                                <span class="font-semibold mr-2">Emergency Ambulance:</span>
+                                <span class="text-xl font-bold">108</span>
+                            </p>
+                            <p class="flex items-center">
+                                <span class="font-semibold mr-2">Cardiology Emergency:</span>
+                                <span class="text-xl font-bold">102</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+                        <a href="/" class="inline-flex items-center justify-center px-8 py-3 text-lg font-semibold text-white bg-gradient-to-r from-red-600 to-red-500 rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                            Back to Prediction
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                        </a>
+                                                      
+                    </div>
+                </div>
+
+                <div class="flex justify-center space-x-4 mt-8">
+                    <button onclick="window.print()" class="print-button bg-red-500 text-white px-6 py-2 rounded-lg shadow-md hover:bg-red-600 transition">Print Report</button>
+                   
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".animate-fade-in").forEach(el => {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.style.transition = "opacity 1s ease-in-out";
+                    el.style.opacity = 1;
+                }, 200);
+            });
+        });
+    </script>
+</body>
+</html>
+
+                        

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | CardioGuard - ML-Powered Heart Disease Prediction</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap");
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            opacity: 0.1;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            50% { transform: rotate(180deg) translate(50px, 50px); }
+            100% { transform: rotate(360deg) translate(0, 0); }
+        }
+
+        .form-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.95);
+            transition: all 0.3s ease;
+        }
+
+        .input-field {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .input-field:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(66, 153, 225, 0.2);
+        }
+
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <nav class="fixed w-full bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-2xl font-semibold gradient-text">CardioGuard</a>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="min-h-screen flex items-center justify-center px-4 pt-16">
+        <div class="form-container p-8 rounded-3xl shadow-xl w-full max-w-md relative z-10">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold mb-3 gradient-text">Welcome Back</h2>
+                <p class="text-gray-600 text-lg">Sign in to your CardioGuard account</p>
+            </div>
+
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-xl mb-6 animate-fade-in">
+                            <p class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"/>
+                                </svg>
+                                {{ message }}
+                            </p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-6">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2" for="username">
+                        Username
+                    </label>
+                    <input class="input-field w-full px-4 py-3 rounded-xl bg-gray-50 text-gray-700 focus:outline-none"
+                           id="username" name="username" type="text" required
+                           placeholder="Enter your username">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2" for="password">
+                        Password
+                    </label>
+                    <input class="input-field w-full px-4 py-3 rounded-xl bg-gray-50 text-gray-700 focus:outline-none"
+                           id="password" name="password" type="password" required
+                           placeholder="Enter your password">
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center">
+                        <input type="checkbox" class="form-checkbox h-4 w-4 text-blue-600 transition duration-150 ease-in-out rounded">
+                        <span class="ml-2 text-gray-600">Remember me</span>
+                    </label>
+                    <a href="{{ url_for('forgot_password') }}" class="text-blue-600 hover:text-blue-800 transition-colors font-medium">Forgot password?</a>
+                </div>
+
+                <button class="btn-primary w-full py-3 px-4 rounded-xl text-white font-semibold focus:outline-none shadow-lg"
+                        type="submit">
+                    Sign In
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-gray-600">Don't have an account?</p>
+                <a class="inline-block mt-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                   href="{{ url_for('register') }}">
+                    Create an account →
+                </a>
+            </div>
+
+            <div class="mt-8 grid grid-cols-2 gap-4">
+                <div class="bg-gradient-to-br from-white to-blue-50 p-4 rounded-xl shadow-lg">
+                    <div class="text-xl font-bold text-blue-600 mb-1">81.97%</div>
+                    <div class="text-gray-600 text-sm">Prediction Accuracy</div>
+                </div>
+                <div class="bg-gradient-to-br from-white to-blue-50 p-4 rounded-xl shadow-lg">
+                    <div class="text-xl font-bold text-blue-600 mb-1">24/7</div>
+                    <div class="text-gray-600 text-sm">Monitoring & Analysis</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardioGuard - Heart Disease Prediction</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Space Grotesk", sans-serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2c2c2c 0%, #4a4a4a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            opacity: 0.1;
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            animation: float 20s infinite linear;
+        }
+
+        .shape:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+
+        .shape:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        .shape:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 50%;
+            left: 50%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0% { transform: rotate(0deg) translate(0, 0); }
+            50% { transform: rotate(180deg) translate(50px, 50px); }
+            100% { transform: rotate(360deg) translate(0, 0); }
+        }
+
+        .input-error {
+            border-color: #ef4444;
+        }
+
+        .form-container {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            border-radius: 1rem;
+        }
+
+        input, select {
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-button {
+            background: linear-gradient(135deg, #4299e1 0%, #667eea 100%);
+            transition: all 0.3s ease;
+        }
+
+        .submit-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen">
+    <div class="floating-shapes">
+        <div class="shape"></div>
+        <div class="shape"></div>
+        <div class="shape"></div>
+    </div>
+
+    <nav class="fixed w-full bg-white bg-opacity-90 backdrop-filter backdrop-blur-lg shadow-sm z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="#" class="text-2xl font-semibold gradient-text">CardioGuard</a>
+                <div class="flex items-center space-x-6">
+                    <a href="{{ url_for('history') }}" class="text-gray-700 hover:text-gray-900 font-medium">View Data</a>
+                    <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-gray-900 font-medium">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto px-4 pt-24 pb-12">
+        <div class="max-w-4xl mx-auto form-container p-8">
+            <h1 class="text-3xl font-bold text-center gradient-text mb-8">Heart Disease Prediction System</h1>
+            
+            <form id="predictionForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Age -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                        <input type="number" name="age" id="age"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter age (20-100)">
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Sex -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Sex</label>
+                        <select name="sex" id="sex"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select gender</option>
+                            <option value="1">1=Male</option>
+                            <option value="0">0=Female</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Chest Pain Type -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Chest Pain Type</label>
+                        <select name="cp" id="cp"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select type</option>
+                            <option value="0">0=Typical angina</option>
+                            <option value="1">1=Atypical angina</option>
+                            <option value="2">2=Non-anginal pain</option>
+                            <option value="3">3=Asymptomatic</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Resting Blood Pressure -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Resting Blood Pressure (mm Hg)</label>
+                        <input type="number" name="trestbps" id="trestbps"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter BP (80-200)">
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Cholesterol -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Serum Cholesterol (mg/dl)</label>
+                        <input type="number" name="chol" id="chol"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter cholesterol (100-600)">
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Fasting Blood Sugar -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fasting Blood Sugar > 120 mg/dl</label>
+                        <select name="fbs" id="fbs"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select option</option>
+                            <option value="1">1=Yes</option>
+                            <option value="0">0=No</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Resting ECG -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Resting ECG Results</label>
+                        <select name="restecg" id="restecg"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select result</option>
+                            <option value="0">0=Normal</option>
+                            <option value="1">1=ST-T wave abnormality</option>
+                            <option value="2">2=Left ventricular hypertrophy</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Max Heart Rate -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Maximum Heart Rate</label>
+                        <input type="number" name="thalach" id="thalach"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter max heart rate (60-220)">
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Exercise Induced Angina -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Exercise Induced Angina</label>
+                        <select name="exang" id="exang"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select option</option>
+                            <option value="1">1=Yes</option>
+                            <option value="0">0=No</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- ST Depression -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">ST Depression</label>
+                        <input type="number" name="oldpeak" id="oldpeak" step="0.1"
+                               class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                               placeholder="Enter ST depression (0-10)">
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Slope -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Slope of Peak Exercise ST Segment</label>
+                        <select name="slope" id="slope"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select slope</option>
+                            <option value="0">0=Upsloping</option>
+                            <option value="1">1=Flat</option>
+                            <option value="2">2=Downsloping</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Number of Vessels -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Number of Major Vessels</label>
+                        <select name="ca" id="ca"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select number</option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+
+                    <!-- Thalassemia -->
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Thalassemia</label>
+                        <select name="thal" id="thal"
+                                class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="">Select type</option>
+                            <option value="1">1=Normal</option>
+                            <option value="2">2=Fixed Defect</option>
+                            <option value="3">3=Reversible Defect</option>
+                        </select>
+                        <p class="error-message text-red-500 text-sm mt-1"></p>
+                    </div>
+                </div>
+
+                <div class="mt-8">
+                    <button type="submit"
+                            class="submit-button w-full text-white py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                        Predict
+                    </button>
+                </div>
+            </form>
+            <div id="prediction-result" class="mt-6 text-center hidden">
+                <div class="p-4 rounded-lg">
+                    <p class="text-xl font-semibold"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+            <!-- Result Display -->
+            <div id="prediction-result" class="mt-6 text-center hidden">
+                <div class="p-4 rounded-lg">
+                    <p class="text-xl font-semibold"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const validationRules = {
+        age: {
+            min: 20,
+            max: 100,
+            validate: (value) => {
+                if (!value) return "Age is required";
+                const age = parseInt(value);
+                if (isNaN(age)) return "Age must be a number";
+                if (age < 20) return "Age must be at least 20";
+                if (age > 100) return "Age must be less than 100";
+                return "";
+            }
+        },
+        sex: {
+            validate: (value) => !value ? "Please select a gender" : ""
+        },
+        cp: {
+            validate: (value) => !value ? "Please select chest pain type" : ""
+        },
+        trestbps: {
+            min: 80,
+            max: 200,
+            validate: (value) => {
+                if (!value) return "Resting blood pressure is required";
+                const bp = parseInt(value);
+                if (isNaN(bp)) return "Blood pressure must be a number";
+                if (bp < 80) return "Blood pressure must be at least 80 mmHg";
+                if (bp > 200) return "Blood pressure must be less than 200 mmHg";
+                return "";
+            }
+        },
+        chol: {
+            min: 100,
+            max: 600,
+            validate: (value) => {
+                if (!value) return "Cholesterol level is required";
+                const chol = parseInt(value);
+                if (isNaN(chol)) return "Cholesterol must be a number";
+                if (chol < 100) return "Cholesterol must be at least 100 mg/dl";
+                if (chol > 600) return "Cholesterol must be less than 600 mg/dl";
+                return "";
+            }
+        },
+        fbs: {
+            validate: (value) => !value ? "Please select fasting blood sugar option" : ""
+        },
+        restecg: {
+            validate: (value) => !value ? "Please select resting ECG result" : ""
+        },
+        thalach: {
+            min: 60,
+            max: 220,
+            validate: (value) => {
+                if (!value) return "Maximum heart rate is required";
+                const rate = parseInt(value);
+                if (isNaN(rate)) return "Heart rate must be a number";
+                if (rate < 60) return "Heart rate must be at least 60";
+                if (rate > 220) return "Heart rate must be less than 220";
+                return "";
+            }
+        },
+        exang: {
+            validate: (value) => !value ? "Please select exercise induced angina option" : ""
+        },
+        oldpeak: {
+            min: 0,
+            max: 10,
+            validate: (value) => {
+                if (!value) return "ST depression is required";
+                const peak = parseFloat(value);
+                if (isNaN(peak)) return "ST depression must be a number";
+                if (peak < 0) return "ST depression must be at least 0";
+                if (peak > 10) return "ST depression must be less than 10";
+                return "";
+            }
+        },
+        slope: {
+            validate: (value) => !value ? "Please select slope type" : ""
+        },
+        ca: {
+            validate: (value) => !value ? "Please select number of vessels" : ""
+        },
+        thal: {
+            validate: (value) => !value ? "Please select thalassemia type" : ""
+        }
+    };
+
+    function validateField(field, value) {
+        const rule = validationRules[field];
+        if (!rule) return "";
+        
+        const error = rule.validate(value);
+        const input = document.getElementById(field);
+        const errorElement = input.nextElementSibling;
+        
+        if (error) {
+            input.classList.add('input-error');
+            errorElement.textContent = error;
+            return false;
+        } else {
+            input.classList.remove('input-error');
+            errorElement.textContent = '';
+            return true;
+        }
+    }
+
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('input', () => validateField(input.name, input.value));
+        input.addEventListener('blur', () => validateField(input.name, input.value));
+    });
+
+        document.getElementById('predictionForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Clear previous errors
+            document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+            document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+
+            // Basic validation
+            let hasErrors = false;
+            for (const [key, value] of Object.entries(data)) {
+                const input = document.getElementById(key);
+                if (!value) {
+                    const errorElement = input.nextElementSibling;
+                    errorElement.textContent = 'This field is required';
+                    input.classList.add('input-error');
+                    hasErrors = true;
+                }
+            }
+
+            if (hasErrors) return;
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                const resultDiv = document.getElementById('prediction-result');
+                resultDiv.classList.remove('hidden');
+
+                if (result.redirect) {
+                    window.location.href = result.redirect;
+                    return;
+                }
+
+                const resultP = resultDiv.querySelector('p');
+            resultP.textContent = result.result;
+            resultP.className = `text-xl font-semibold ${result.result.includes('NOT DETECTED') ? 'text-green-600' : 'text-blue-600'}`;
+
+                if (result.errors) {
+                    Object.entries(result.errors).forEach(([field, error]) => {
+                        const input = document.getElementById(field);
+                        const errorElement = input.nextElementSibling;
+                        errorElement.textContent = error;
+                        input.classList.add('input-error');
+                    });
+                }
+
+            } catch (error) {
+                console.error('Prediction error:', error);
+                const resultDiv = document.getElementById('prediction-result');
+                resultDiv.classList.remove('hidden');
+                resultDiv.querySelector('p').textContent = 'Invalid input detected. Please check and correct all fields before submitting.';
+                resultDiv.querySelector('p').className = 'text-xl font-semibold text-red-600';
+            }
+        });
+
+        // Real-time validation
+        document.querySelectorAll('input, select').forEach(input => {
+            input.addEventListener('input', () => {
+                const errorElement = input.nextElementSibling;
+                if (input.value) {
+                    errorElement.textContent = '';
+                    input.classList.remove('input-error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>  
+
